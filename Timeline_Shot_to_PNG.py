@@ -4,6 +4,8 @@
 Timeline Shot to PNG + XML - 读取时间线轨道，生成 PNG 和 FCP 7 XML v5
 支持：从外部配置文件读取参数，无需修改脚本文件
 
+版本: v1.0.1
+
 使用方法：
 1. 双击运行 ShotTrackTools_Configurator.py 配置参数（只需运行一次，或参数变更时）
 2. 在达芬奇中运行：Workspace > Scripts > Utility > ShotTrackTools > Timeline_Shot_to_PNG
@@ -12,54 +14,30 @@ Timeline Shot to PNG + XML - 读取时间线轨道，生成 PNG 和 FCP 7 XML v5
 """
 
 import os
-import json
+import sys
 
-if 'resolve' not in globals():
-    import DaVinciResolveScript as dvr
-    resolve = dvr.scriptapp("Resolve")
+# 确保能导入同级目录的公共模块
+_script_dir = os.path.dirname(os.path.abspath(__file__))
+if _script_dir not in sys.path:
+    sys.path.insert(0, _script_dir)
+
+import shottracktools_utils as stu
+
+resolve = stu.get_resolve()
 
 
 # ==================== 默认参数 ====================
-DEFAULT_CONFIG = {
+_DEFAULTS = {
     "track": "V10",
     "output_dir": "",
     "remove_suffix": True,
 }
-CONFIG_FILE = os.path.join(os.path.expanduser("~"), ".shottracktools", "config.json")
+_SCHEMA = {
+    "track": ("png_track", str),
+    "output_dir": ("output_dir", str),
+    "remove_suffix": ("png_remove_suffix", None),
+}
 # =================================================
-
-
-def get_params():
-    """读取配置文件，如果不存在则使用默认参数"""
-    if os.path.exists(CONFIG_FILE):
-        try:
-            with open(CONFIG_FILE, "r", encoding="utf-8") as f:
-                config = json.load(f)
-            print("[Config] 已读取配置文件:", CONFIG_FILE)
-            return {
-                "track": str(config.get("png_track", DEFAULT_CONFIG["track"])),
-                "output_dir": str(config.get("output_dir", DEFAULT_CONFIG["output_dir"])),
-                "remove_suffix": config.get("png_remove_suffix", DEFAULT_CONFIG["remove_suffix"]),
-            }
-        except Exception as e:
-            print("[Config] 读取配置文件失败: {}".format(str(e)))
-            print("[Config] 将使用默认参数")
-    else:
-        print("[Config] 配置文件不存在，使用默认参数")
-        print("[Config] 提示：运行 ShotTrackTools_Configurator.py 可配置参数")
-    return DEFAULT_CONFIG
-
-
-def parse_track(track_str):
-    """解析 V10 / A1 格式为 (track_type, track_index)"""
-    track_str = track_str.strip().upper()
-    if not track_str or track_str[0] not in ("V", "A"):
-        raise ValueError("轨道格式错误，请使用 V10 / V1 / A1")
-    try:
-        idx = int(track_str[1:])
-    except ValueError:
-        raise ValueError("轨道号必须是数字")
-    return ("video" if track_str[0] == "V" else "audio", idx)
 
 
 def generate_png(filepath):
@@ -191,7 +169,7 @@ def generate_fcp7_xml_v5(timeline, track_items, output_dir, fps, remove_suffix):
 
 
 def main():
-    cfg = get_params()
+    cfg = stu.get_params(_SCHEMA, _DEFAULTS)
 
     # 检查 Pillow 是否可用
     try:
@@ -231,7 +209,7 @@ def main():
     print("-" * 40)
 
     # 读取目标轨道
-    track_type, track_idx = parse_track(cfg["track"])
+    track_type, track_idx = stu.parse_track(cfg["track"])
     items = timeline.GetItemListInTrack(track_type, track_idx)
     if not items:
         print("错误：{} 轨道上没有片段".format(cfg["track"]))

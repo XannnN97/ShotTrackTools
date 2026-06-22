@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Generated outputs (user runtime)
+*.png
+*.xml
+shot_list.json
+
+# User config directory
+config.json
+
+# Distribution
+build/
+dist/
+*.egg-info/

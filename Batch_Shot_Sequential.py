@@ -4,6 +4,8 @@
 Batch Shot Sequential - 批量顺序递增命名时间线轨道上的 Clip Name
 支持：从外部配置文件读取参数，无需修改脚本文件
 
+版本: v1.0.1
+
 修改逻辑：只修改时间线片段的显示名（SetName），不修改媒体池名称
 避免素材复用导致所有引用同步变更的问题
 
@@ -14,15 +16,20 @@ Batch Shot Sequential - 批量顺序递增命名时间线轨道上的 Clip Name
 """
 
 import os
-import json
+import sys
 
-if 'resolve' not in globals():
-    import DaVinciResolveScript as dvr
-    resolve = dvr.scriptapp("Resolve")
+# 确保能导入同级目录的公共模块
+_script_dir = os.path.dirname(os.path.abspath(__file__))
+if _script_dir not in sys.path:
+    sys.path.insert(0, _script_dir)
+
+import shottracktools_utils as stu
+
+resolve = stu.get_resolve()
 
 
 # ==================== 默认参数 ====================
-DEFAULT_CONFIG = {
+_DEFAULTS = {
     "track": "V10",
     "prefix": "2Esq1400_",
     "start": 10,
@@ -30,48 +37,19 @@ DEFAULT_CONFIG = {
     "padding": 4,
     "remove_suffix": True,
 }
-CONFIG_FILE = os.path.join(os.path.expanduser("~"), ".shottracktools", "config.json")
+_SCHEMA = {
+    "track": ("seq_track", str),
+    "prefix": ("seq_prefix", str),
+    "start": ("seq_start", int),
+    "step": ("seq_step", int),
+    "padding": ("seq_padding", int),
+    "remove_suffix": ("seq_remove_suffix", None),
+}
 # =================================================
 
 
-def get_params():
-    """读取配置文件，如果不存在则使用默认参数"""
-    if os.path.exists(CONFIG_FILE):
-        try:
-            with open(CONFIG_FILE, "r", encoding="utf-8") as f:
-                config = json.load(f)
-            print("[Config] 已读取配置文件:", CONFIG_FILE)
-            return {
-                "track": str(config.get("seq_track", DEFAULT_CONFIG["track"])),
-                "prefix": str(config.get("seq_prefix", DEFAULT_CONFIG["prefix"])),
-                "start": int(config.get("seq_start", DEFAULT_CONFIG["start"])),
-                "step": int(config.get("seq_step", DEFAULT_CONFIG["step"])),
-                "padding": int(config.get("seq_padding", DEFAULT_CONFIG["padding"])),
-                "remove_suffix": config.get("seq_remove_suffix", DEFAULT_CONFIG["remove_suffix"]),
-            }
-        except Exception as e:
-            print("[Config] 读取配置文件失败: {}".format(str(e)))
-            print("[Config] 将使用默认参数")
-    else:
-        print("[Config] 配置文件不存在，使用默认参数")
-        print("[Config] 提示：运行 ShotTrackTools_Configurator.py 可配置参数")
-    return DEFAULT_CONFIG
-
-
-def parse_track(track_str):
-    """解析 V10 / A1 格式为 (track_type, track_index)"""
-    track_str = track_str.strip().upper()
-    if not track_str or track_str[0] not in ("V", "A"):
-        raise ValueError("轨道格式错误，请使用 V10 / V1 / A1")
-    try:
-        idx = int(track_str[1:])
-    except ValueError:
-        raise ValueError("轨道号必须是数字")
-    return ("video" if track_str[0] == "V" else "audio", idx)
-
-
 def main():
-    cfg = get_params()
+    cfg = stu.get_params(_SCHEMA, _DEFAULTS)
 
     project = resolve.GetProjectManager().GetCurrentProject()
     timeline = project.GetCurrentTimeline()
@@ -86,7 +64,7 @@ def main():
     print("去掉后缀:", cfg["remove_suffix"])
     print("-" * 40)
 
-    track_type, track_idx = parse_track(cfg["track"])
+    track_type, track_idx = stu.parse_track(cfg["track"])
     items = timeline.GetItemListInTrack(track_type, track_idx)
     if not items:
         print("错误：{} 轨道上没有片段".format(cfg["track"]))
