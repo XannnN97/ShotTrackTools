@@ -17,8 +17,16 @@ import os
 import sys
 
 # 确保能导入同级目录的公共模块
-_script_dir = os.path.dirname(os.path.abspath(__file__))
-if _script_dir not in sys.path:
+_script_dir = None
+try:
+    _script_dir = os.path.dirname(os.path.abspath(__file__))
+except NameError:
+    # 在达芬奇中运行时 __file__ 可能未定义
+    if hasattr(sys, 'argv') and sys.argv:
+        _script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+    if not _script_dir:
+        _script_dir = os.getcwd()
+if _script_dir and _script_dir not in sys.path:
     sys.path.insert(0, _script_dir)
 
 import shottracktools_utils as stu

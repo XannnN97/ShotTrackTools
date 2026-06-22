@@ -18,8 +18,16 @@ CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
 
 def get_resolve():
     """获取 DaVinci Resolve 对象，支持外部执行"""
+    # 首先检查当前模块的 globals（外部运行时）
     if 'resolve' in globals():
         return resolve
+    # 再检查 __main__ 的 globals（在达芬奇中通过脚本菜单运行时）
+    import sys
+    _main = sys.modules.get('__main__')
+    if _main is not None:
+        _main_resolve = getattr(_main, 'resolve', None)
+        if _main_resolve is not None:
+            return _main_resolve
     try:
         import DaVinciResolveScript as dvr
         return dvr.scriptapp("Resolve")
