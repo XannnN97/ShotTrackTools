@@ -62,6 +62,7 @@ def run(resolve, cfg):
     logs.append("{} track has {} clip(s)".format(cfg["track"], len(items)))
     items = sorted(items, key=lambda x: x.GetStart())
     renamed = 0
+    undo_items = []
 
     for i, item in enumerate(items):
         name = item.GetName()

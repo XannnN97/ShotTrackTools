@@ -48,7 +48,7 @@ def execute(type, params):
         return {"success": True, "logs": r["logs"], "undoData": r.get("undoData")}
     elif type == "png_export":
         r = png_exporter.run(resolve, params)
-        return {"success": True, "logs": r["logs"]}
+        return {"success": True, "logs": r if isinstance(r, list) else r["logs"]}
     elif type == "remove_suffix":
         r = remove_suffix.run(resolve)
         return {"success": True, "logs": r["logs"], "undoData": r.get("undoData")}
