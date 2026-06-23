@@ -7,7 +7,8 @@ Workflow Integration 版本，返回日志列表而非直接打印
 
 import os
 import json
-import sys
+import struct
+import zlib
 
 from shottracktools_utils import parse_track
 
@@ -25,10 +26,36 @@ _SCHEMA = {
 
 
 def generate_png(filepath):
-    """使用 Pillow 生成 1x1 透明 PNG"""
-    from PIL import Image
-    img = Image.new("RGBA", (1, 1), (0, 0, 0, 0))
-    img.save(filepath)
+    """生成 1x1 透明 PNG，纯 Python 标准库实现，无需 Pillow"""
+    width = 1
+    height = 1
+    raw_data = b'\x00\x00\x00\x00'  # RGBA 全透明
+
+    # 扫描行：filter byte 0 + raw data
+    scanline = b'\x00' + raw_data
+    compressed = zlib.compress(scanline)
+
+    # PNG 签名
+    signature = b'\x89PNG\r\n\x1a\n'
+
+    # IHDR chunk
+    ihdr_data = struct.pack('>IIBBBBB', width, height, 8, 6, 0, 0, 0)
+    ihdr = _make_chunk(b'IHDR', ihdr_data)
+
+    # IDAT chunk
+    idat = _make_chunk(b'IDAT', compressed)
+
+    # IEND chunk
+    iend = _make_chunk(b'IEND', b'')
+
+    with open(filepath, 'wb') as f:
+        f.write(signature + ihdr + idat + iend)
+
+
+def _make_chunk(chunk_type, data):
+    chunk = chunk_type + data
+    crc = zlib.crc32(chunk) & 0xffffffff
+    return struct.pack('>I', len(data)) + chunk + struct.pack('>I', crc)
 
 
 def generate_fcp7_xml_v5(timeline, track_items, output_dir, fps, remove_suffix):
@@ -168,20 +195,6 @@ def run(resolve, cfg):
         logs.append("[ERROR] No open timeline. Please open a timeline first.")
         return logs
 
-    # 检查 Pillow，未安装时尝试自动安装
-    try:
-        from PIL import Image
-        pillow_available = True
-    except ImportError:
-        pillow_available = False
-        try:
-            import subprocess
-            subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pillow'])
-            from PIL import Image
-            pillow_available = True
-        except Exception:
-            pillow_available = False
-
     # 确定输出目录
     output_dir = cfg["output_dir"]
     if not output_dir:
@@ -201,7 +214,6 @@ def run(resolve, cfg):
     logs.append("Timeline: {}".format(timeline.GetName()))
     logs.append("Target track: {}".format(cfg["track"]))
     logs.append("Output directory: {}".format(output_dir))
-    logs.append("Pillow available: {}".format(pillow_available))
     logs.append("Timeline FPS: {}".format(fps))
     logs.append("-" * 40)
 
@@ -219,7 +231,6 @@ def run(resolve, cfg):
     logs.append("{} track has {} clip(s)".format(cfg["track"], len(items)))
     items = sorted(items, key=lambda x: x.GetStart())
 
-    shots = []
     png_count = 0
 
     for i, item in enumerate(items):
@@ -232,49 +243,24 @@ def run(resolve, cfg):
 
         clean_name = os.path.splitext(name)[0] if cfg["remove_suffix"] else name
 
-        shots.append({
-            "name": clean_name,
-            "start": item.GetStart(),
-            "end": item.GetEnd(),
-        })
-
-        if pillow_available:
-            filepath = os.path.join(output_dir, "{}.png".format(clean_name))
-            generate_png(filepath)
-            logs.append("  [PNG] {}.png".format(clean_name))
-            png_count += 1
-        else:
-            logs.append("  [LOG] {}".format(clean_name))
+        filepath = os.path.join(output_dir, "{}.png".format(clean_name))
+        generate_png(filepath)
+        logs.append("  [PNG] {}.png".format(clean_name))
+        png_count += 1
 
     xml_path = generate_fcp7_xml_v5(timeline, items, output_dir, fps, cfg["remove_suffix"])
     logs.append("  [XML] {}".format(xml_path))
 
-    if not pillow_available:
-        json_path = os.path.join(output_dir, "shot_list.json")
-        json_data = {
-            "project": project.GetName(),
-            "timeline": timeline.GetName(),
-            "track": cfg["track"],
-            "output_dir": output_dir,
-            "shots": shots,
-        }
-        with open(json_path, "w", encoding="utf-8") as f:
-            json.dump(json_data, f, ensure_ascii=False, indent=2)
-        logs.append("-" * 40)
-        logs.append("Pillow not installed, PNGs not generated.")
-        logs.append("JSON list exported: {}".format(json_path))
-        logs.append("Please install Pillow: pip install pillow")
-    else:
-        logs.append("-" * 40)
-        logs.append("Done! {} clips total".format(len(shots)))
-        logs.append("PNG generated: {}".format(png_count))
-        logs.append("XML: {}".format(xml_path))
-        logs.append("Output directory: {}".format(output_dir))
-        logs.append("")
-        logs.append("[Import to Resolve]")
-        logs.append("1. File > Import > Timeline")
-        logs.append("2. Select shot_track.xml")
-        logs.append("3. Import to new or existing timeline")
-        logs.append("4. Ensure PNG paths match XML pathurl")
+    logs.append("-" * 40)
+    logs.append("Done! {} clips total".format(len(items)))
+    logs.append("PNG generated: {}".format(png_count))
+    logs.append("XML: {}".format(xml_path))
+    logs.append("Output directory: {}".format(output_dir))
+    logs.append("")
+    logs.append("[Import to Resolve]")
+    logs.append("1. File > Import > Timeline")
+    logs.append("2. Select shot_track.xml")
+    logs.append("3. Import to new or existing timeline")
+    logs.append("4. Ensure PNG paths match XML pathurl")
 
     return logs

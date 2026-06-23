@@ -1,1 +1,2 @@
-Pillow>=9.0.0
+# ShotTrackTools has no external dependencies.
+# All required libraries are included in Python's standard library.

@@ -29,10 +29,11 @@ ShotTrackTools 是一套用于 **DaVinci Resolve** 的 VFX/剪辑交接工作流
 
 统一 GUI 窗口，支持中英文切换，功能集中在一个面板中操作。
 
-**系统要求**：
+**系统要求**（无外部依赖）：
 - DaVinci Resolve **Studio**（免费版不支持 Workflow Integration）
 - Python 3.9+（64位）
-- Pillow（`pip install pillow`）
+
+**无需安装任何 Python 包**，PNG 生成使用 Python 内置 `zlib` / `struct` 模块。
 
 **安装步骤**：
 
@@ -138,10 +139,6 @@ ShotTrackTools/
 - 确认 Python 安装时包含 tkinter（安装时勾选 tcl/tk 和 IDLE）
 - 确认屏幕分辨率足够显示窗口内容（建议 1080p+）
 
-**Q5：Timeline_Shot_to_PNG 提示 Pillow 未安装**
-
-- 在 CMD 中运行 `pip install pillow`，然后重新运行脚本
-
 ---
 
 ## English
@@ -165,10 +162,11 @@ ShotTrackTools is a set of VFX/editorial handoff workflow utilities for **DaVinc
 
 Unified GUI with bilingual (CN/EN) support.
 
-**Requirements**:
+**Requirements** (No external dependencies):
 - DaVinci Resolve **Studio** (Free version does not support Workflow Integration)
 - Python 3.9+ (64-bit)
-- Pillow (`pip install pillow`)
+
+**No Python packages need to be installed**. PNG generation uses Python's built-in `zlib` / `struct` modules.
 
 **Steps**:
 
