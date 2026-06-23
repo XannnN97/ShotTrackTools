@@ -7,6 +7,7 @@ Workflow Integration 版本，返回日志列表而非直接打印
 
 import os
 import json
+import sys
 
 from shottracktools_utils import parse_track
 
@@ -167,12 +168,19 @@ def run(resolve, cfg):
         logs.append("[ERROR] No open timeline. Please open a timeline first.")
         return logs
 
-    # 检查 Pillow
+    # 检查 Pillow，未安装时尝试自动安装
     try:
         from PIL import Image
         pillow_available = True
     except ImportError:
         pillow_available = False
+        try:
+            import subprocess
+            subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pillow'])
+            from PIL import Image
+            pillow_available = True
+        except Exception:
+            pillow_available = False
 
     # 确定输出目录
     output_dir = cfg["output_dir"]
