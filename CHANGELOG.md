@@ -1,5 +1,24 @@
 # ShotTrackTools 更新日志
 
+## [1.1.0] - 2025-06-22
+
+### Workflow Integration 插件（新增）
+- 新增官方 Workflow Integration 插件架构，通过 `Workspace → Workflow Integrations` 菜单加载
+- 统一 GUI 窗口：左侧功能选择 + 右侧参数配置 + 底部日志输出
+- 支持中英文语言切换（运行时即时切换）
+- 基于 Electron 包装器（main.js + preload.js + index.html）+ Python tkinter GUI 的混合架构
+- 完整 Electron 应用：manifest.xml / package.json / main.js / preload.js / index.html
+- 适配 DaVinci Resolve v19.0.2+ 安全限制（contextIsolation + sandboxing）
+- 通过 IPC 通信启动 Python 子进程，自动注入 `PYTHONPATH` 和 `RESOLVE_SCRIPT_LIB` 环境变量
+- 核心功能逻辑（lib/目录）从 Scripts 菜单版本提取为独立模块，返回日志列表而非直接打印
+
+### 架构重构
+- 新增 `workflow_integration/` 目录，包含完整的插件结构
+- 提取 `lib/renamer.py`、`lib/sequential.py`、`lib/png_exporter.py`、`lib/remove_suffix.py`
+- 每个功能模块独立为 `run(resolve, cfg)` 接口，返回 `list[str]` 日志
+
+---
+
 ## [1.0.1] - 2025-06-22
 
 ### 工程化改进
