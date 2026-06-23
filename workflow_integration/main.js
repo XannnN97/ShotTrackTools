@@ -37,26 +37,10 @@ function getPythonEnv() {
   return env;
 }
 
-function findPythonCommand() {
-  const { execSync } = require('child_process');
-  const commands = ['python', 'python3', 'py'];
-  for (const cmd of commands) {
-    try {
-      execSync(`${cmd} -c "from PIL import Image"`, { stdio: 'pipe', env: getPythonEnv() });
-      console.log('Found Python with Pillow:', cmd);
-      return cmd;
-    } catch (e) {
-      // 该命令没有 Pillow，尝试下一个
-    }
-  }
-  console.log('No Python with Pillow found, fallback to py -3');
-  return 'py -3';
-}
-
 async function callPython(action, data) {
   return new Promise((resolve, reject) => {
     const pluginDir = __dirname;
-    const pythonCmd = findPythonCommand();
+    const pythonCmd = process.platform === 'win32' ? 'py' : 'python3';
     const scriptPath = path.join(pluginDir, 'backend.py');
 
     const proc = spawn(pythonCmd, ['-3', scriptPath], {
