@@ -1,13 +1,14 @@
 # ShotTrackTools 更新日志
 
-## [1.1.0] - 2025-06-22
+## [1.1.0] - 2025-06-23
 
-### Workflow Integration 插件（新增）
+### Workflow Integration 插件（正式发布）
 - 新增官方 Workflow Integration 插件架构，通过 `Workspace → Workflow Integrations` 菜单加载
-- 统一 GUI 窗口：左侧功能选择 + 右侧参数配置 + 底部日志输出
+- **纯 HTML UI**：单 Electron 窗口内完成所有操作，无第二弹窗，深色主题接近达芬奇风格
 - 支持中英文语言切换（运行时即时切换）
-- 基于 Electron 包装器（main.js + preload.js + index.html）+ Python tkinter GUI 的混合架构
-- 完整 Electron 应用：manifest.xml / package.json / main.js / preload.js / index.html
+- 左侧功能导航 + 右侧参数表单 + 底部日志输出区域
+- **撤回（Undo）功能**：支持批量替换、顺序递增、去后缀的撤回，自动记录原始名称
+- 基于 Electron 包装器（main.js + preload.js + index.html + app.js + style.css）+ Python 后端的混合架构
 - 适配 DaVinci Resolve v19.0.2+ 安全限制（contextIsolation + sandboxing）
 - 通过 IPC 通信启动 Python 子进程，自动注入 `PYTHONPATH` 和 `RESOLVE_SCRIPT_LIB` 环境变量
 - 核心功能逻辑（lib/目录）从 Scripts 菜单版本提取为独立模块，返回日志列表而非直接打印
@@ -15,7 +16,21 @@
 ### 架构重构
 - 新增 `workflow_integration/` 目录，包含完整的插件结构
 - 提取 `lib/renamer.py`、`lib/sequential.py`、`lib/png_exporter.py`、`lib/remove_suffix.py`
-- 每个功能模块独立为 `run(resolve, cfg)` 接口，返回 `list[str]` 日志
+- 每个功能模块独立为 `run(resolve, cfg)` 接口，返回日志
+- 新增 `backend.py` 作为 Python 后端执行引擎（接收 stdin JSON，返回 stdout JSON）
+- 各模块返回 undoData 支持撤回操作
+
+### 工程化改进
+- 新增 `legacy/` 文件夹，旧版 Scripts 菜单独立脚本归档整理
+- 根目录只保留文档、配置和新版 `workflow_integration/` 文件夹
+- **移除 Pillow 依赖**：PNG 生成使用 Python 标准库 `zlib` / `struct` 实现，无需任何外部 Python 包
+- 修复 XML 生成循环缩进问题，确保每个 clipitem 标签正确闭合
+
+### 修复
+- 修复 `renamer.py` `undo_items` 未初始化导致 `NameError`
+- 修复 `backend.py` 对 `png_exporter` list/dict 返回值的兼容性处理
+- 修复 Electron 中 `findPythonCommand` 返回含空格字符串导致 `spawn ENOENT`
+- 修复 Python 子进程无法找到 `DaVinciResolveScript` 模块的问题（注入 PYTHONPATH）
 
 ---
 
