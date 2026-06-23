@@ -67,6 +67,7 @@ def run(resolve, cfg):
     logs.append("{} track has {} clip(s)".format(cfg["track"], len(items)))
     items = sorted(items, key=lambda x: x.GetStart())
     renamed = 0
+    undo_items = []
 
     for i, item in enumerate(items):
         name = item.GetName()
@@ -78,6 +79,9 @@ def run(resolve, cfg):
 
         old_name = name
         working = os.path.splitext(old_name)[0] if cfg["remove_suffix"] else old_name
+
+        # 记录原始名称
+        undo_items.append({"start": item.GetStart(), "originalName": old_name})
 
         num = cfg["start"] + (i * cfg["step"])
         new_name = "{}{}".format(cfg["prefix"], str(num).zfill(cfg["padding"]))
@@ -92,4 +96,11 @@ def run(resolve, cfg):
     logs.append("-" * 40)
     logs.append("Done: {} clips total, {} renamed.".format(len(items), renamed))
     logs.append("Note: Only timeline display names were changed, Media Pool unchanged.")
-    return logs
+    return {
+        "logs": logs,
+        "undoData": {
+            "type": "sequential",
+            "track": cfg["track"],
+            "items": undo_items
+        }
+    }

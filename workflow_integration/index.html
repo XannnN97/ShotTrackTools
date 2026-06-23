@@ -1,98 +1,41 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>ShotTrackTools</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: #1a1a1a;
-            color: #e0e0e0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            padding: 30px;
-        }
-        .container {
-            text-align: center;
-            max-width: 400px;
-        }
-        .logo {
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
-        h1 {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #fff;
-        }
-        .version {
-            font-size: 14px;
-            color: #888;
-            margin-bottom: 20px;
-        }
-        .description {
-            font-size: 14px;
-            color: #aaa;
-            line-height: 1.6;
-            margin-bottom: 30px;
-        }
-        .btn-launch {
-            background: #0078D4;
-            color: white;
-            border: none;
-            padding: 14px 40px;
-            font-size: 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-weight: 500;
-        }
-        .btn-launch:hover {
-            background: #005a9e;
-        }
-        .btn-launch:active {
-            transform: scale(0.98);
-        }
-        .footer {
-            margin-top: 25px;
-            font-size: 12px;
-            color: #666;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>ShotTrackTools</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="logo">🎬</div>
-        <h1>ShotTrackTools</h1>
-        <div class="version">v1.1.0</div>
-        <div class="description">
-            Batch shot naming, sequential numbering,<br>
-            PNG placeholder generation & suffix cleanup<br>
-            for DaVinci Resolve timeline workflows.
-        </div>
-        <button class="btn-launch" id="launchBtn">Launch ShotTrackTools</button>
-        <div class="footer">BaseFX VFX Pipeline Tools</div>
+  <div class="header">
+    <div>
+      <span class="header-title">ShotTrackTools</span>
+      <span class="header-version" id="versionText">版本 1.1.0</span>
     </div>
+    <div class="lang-switch">
+      <button class="lang-btn active" data-lang="zh">中文</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+  </div>
 
-    <script>
-        document.getElementById('launchBtn').addEventListener('click', () => {
-            window.shottracktools.launchPython();
-            document.getElementById('launchBtn').textContent = 'Launching...';
-            document.getElementById('launchBtn').disabled = true;
-            setTimeout(() => {
-                document.getElementById('launchBtn').textContent = 'Launch ShotTrackTools';
-                document.getElementById('launchBtn').disabled = false;
-            }, 3000);
-        });
-    </script>
+  <div class="main">
+    <div class="sidebar" id="sidebar"></div>
+    <div class="content-area">
+      <div id="content" style="padding:20px;overflow-y:auto;">
+        <p style="color:#888;padding:40px 0;text-align:center;">请选择左侧功能</p>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="btnExecute">执行</button>
+        <button class="btn btn-secondary" id="btnUndo" disabled>撤回</button>
+      </div>
+      <div class="log-panel">
+        <div class="log-header" id="logHeader">日志</div>
+        <div class="log-body" id="logBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-bar" id="statusText">就绪</div>
+
+  <script src="app.js"></script>
 </body>
 </html>

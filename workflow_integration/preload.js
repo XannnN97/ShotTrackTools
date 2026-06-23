@@ -1,7 +1,7 @@
-// ShotTrackTools - Preload Script (compatible with contextIsolation)
-
 const { contextBridge, ipcRenderer } = require('electron');
 
-contextBridge.exposeInMainWorld('shottracktools', {
-    launchPython: () => ipcRenderer.send('launch-python')
+contextBridge.exposeInMainWorld('electronAPI', {
+  execute: (data) => ipcRenderer.invoke('execute', data),
+  undo: (data) => ipcRenderer.invoke('undo', data),
+  browseOutput: () => ipcRenderer.invoke('browse-output')
 });

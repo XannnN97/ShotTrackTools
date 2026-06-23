@@ -1,99 +1,80 @@
-// ShotTrackTools Workflow Integration - Electron Main Process
-// Compatible with DaVinci Resolve v19.0.2+ (contextIsolation + sandboxing)
-
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const { spawn } = require('child_process');
 const path = require('path');
 
 let mainWindow;
-let pythonProcess = null;
 
 function createWindow() {
-    mainWindow = new BrowserWindow({
-        width: 500,
-        height: 350,
-        useContentSize: true,
-        resizable: false,
-        webPreferences: {
-            preload: path.join(__dirname, 'preload.js'),
-            contextIsolation: true,
-            nodeIntegration: false
-        }
-    });
-
-    mainWindow.loadFile('index.html');
-
-    // 窗口关闭时清理 Python 子进程
-    mainWindow.on('close', () => {
-        if (pythonProcess) {
-            pythonProcess.kill();
-            pythonProcess = null;
-        }
-    });
+  mainWindow = new BrowserWindow({
+    width: 900,
+    height: 700,
+    useContentSize: true,
+    minWidth: 700,
+    minHeight: 500,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false
+    }
+  });
+  mainWindow.loadFile('index.html');
 }
 
-app.whenReady().then(() => {
-    console.log('ShotTrackTools Workflow Integration initialized');
-    createWindow();
-});
+app.whenReady().then(createWindow);
 
-app.on('window-all-closed', () => {
-    if (pythonProcess) {
-        pythonProcess.kill();
-        pythonProcess = null;
-    }
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
-});
+app.on('window-all-closed', () => { app.quit(); });
 
-// 处理启动 Python 脚本的请求
-ipcMain.on('launch-python', () => {
-    if (pythonProcess) {
-        console.log('Python script already running');
-        return;
-    }
+function getPythonEnv() {
+  const env = Object.assign({}, process.env);
+  const resolveModules = path.join(
+    process.env.PROGRAMDATA || 'C:\\ProgramData',
+    'Blackmagic Design', 'DaVinci Resolve', 'Support', 'Developer', 'Scripting', 'Modules'
+  );
+  env.PYTHONPATH = env.PYTHONPATH ? resolveModules + ';' + env.PYTHONPATH : resolveModules;
+  if (!env.RESOLVE_SCRIPT_LIB) {
+    env.RESOLVE_SCRIPT_LIB = 'C:\\Program Files\\Blackmagic Design\\DaVinci Resolve\\fusionscript.dll';
+  }
+  return env;
+}
 
+async function callPython(action, data) {
+  return new Promise((resolve, reject) => {
     const pluginDir = __dirname;
     const pythonCmd = process.platform === 'win32' ? 'py' : 'python3';
-    const scriptPath = path.join(pluginDir, 'ShotTrackTools_Workflow.py');
+    const scriptPath = path.join(pluginDir, 'backend.py');
 
-    // 设置 PYTHONPATH 帮助 Python 找到 Resolve Scripting 模块
-    const env = Object.assign({}, process.env);
-    const resolveModules = path.join(
-        process.env.PROGRAMDATA || 'C:\\ProgramData',
-        'Blackmagic Design', 'DaVinci Resolve', 'Support', 'Developer', 'Scripting', 'Modules'
-    );
-    env.PYTHONPATH = env.PYTHONPATH ? resolveModules + ';' + env.PYTHONPATH : resolveModules;
-    // 同时设置 RESOLVE_SCRIPT_LIB 环境变量（帮助 DaVinciResolveScript 找到 DLL）
-    if (!env.RESOLVE_SCRIPT_LIB) {
-        env.RESOLVE_SCRIPT_LIB = 'C:\\Program Files\\Blackmagic Design\\DaVinci Resolve\\fusionscript.dll';
-    }
-
-    console.log('Launching Python script:', scriptPath);
-    console.log('PYTHONPATH:', env.PYTHONPATH);
-
-    pythonProcess = spawn(pythonCmd, ['-3', scriptPath], {
-        cwd: pluginDir,
-        env: env,
-        detached: false
+    const proc = spawn(pythonCmd, ['-3', scriptPath], {
+      cwd: pluginDir,
+      env: getPythonEnv(),
+      stdio: ['pipe', 'pipe', 'pipe']
     });
 
-    pythonProcess.stdout.on('data', (data) => {
-        console.log('[Python stdout]', data.toString().trim());
+    let stdout = '';
+    let stderr = '';
+
+    proc.stdout.on('data', (d) => { stdout += d.toString(); });
+    proc.stderr.on('data', (d) => { stderr += d.toString(); });
+
+    proc.on('close', (code) => {
+      if (stderr) console.error('[Python stderr]', stderr);
+      try {
+        const lines = stdout.trim().split('\n').filter(l => l);
+        const result = JSON.parse(lines[lines.length - 1]);
+        resolve(result);
+      } catch (e) {
+        reject(new Error('Parse error. stdout: ' + stdout + ' | stderr: ' + stderr));
+      }
     });
 
-    pythonProcess.stderr.on('data', (data) => {
-        console.error('[Python stderr]', data.toString().trim());
-    });
+    proc.on('error', (err) => reject(err));
+    proc.stdin.write(JSON.stringify({ action, ...data }) + '\n');
+    proc.stdin.end();
+  });
+}
 
-    pythonProcess.on('close', (code) => {
-        console.log('Python process exited with code', code);
-        pythonProcess = null;
-    });
-
-    pythonProcess.on('error', (err) => {
-        console.error('Failed to start Python process:', err.message);
-        pythonProcess = null;
-    });
+ipcMain.handle('execute', async (e, data) => callPython('execute', data));
+ipcMain.handle('undo', async (e, data) => callPython('undo', data));
+ipcMain.handle('browse-output', async () => {
+  const r = await dialog.showOpenDialog(mainWindow, { properties: ['openDirectory'] });
+  return r.filePaths[0] || null;
 });

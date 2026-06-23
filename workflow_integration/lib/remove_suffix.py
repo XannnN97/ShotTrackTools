@@ -34,14 +34,23 @@ def run(resolve):
         return logs
 
     renamed_count = 0
+    undo_items = []
     for clip in clips:
         name = clip.GetClipProperty("Clip Name")
         if name and name.endswith(".png"):
             new_name = name[:-4]
+            undo_items.append({"originalName": name, "newName": new_name})
             clip.SetClipProperty("Clip Name", new_name)
             renamed_count += 1
             logs.append("  Renamed: {} -> {}".format(name, new_name))
 
     logs.append("-" * 40)
     logs.append("Done! {} clip(s) renamed in '{}'.".format(renamed_count, folder.GetName()))
-    return logs
+    return {
+        "logs": logs,
+        "undoData": {
+            "type": "remove_suffix",
+            "folderName": folder.GetName(),
+            "items": undo_items
+        }
+    }

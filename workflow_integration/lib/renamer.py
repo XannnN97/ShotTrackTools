@@ -74,6 +74,9 @@ def run(resolve, cfg):
         old_name = name
         working = os.path.splitext(old_name)[0] if cfg["remove_suffix"] else old_name
 
+        # 记录原始名称
+        undo_items.append({"start": item.GetStart(), "originalName": old_name})
+
         if cfg["search"] in working:
             new_name = working.replace(cfg["search"], cfg["replace"])
             if new_name != old_name:
@@ -88,4 +91,11 @@ def run(resolve, cfg):
     logs.append("-" * 40)
     logs.append("Done: {} clips total, {} renamed.".format(len(items), renamed))
     logs.append("Note: Only timeline display names were changed, Media Pool unchanged.")
-    return logs
+    return {
+        "logs": logs,
+        "undoData": {
+            "type": "renamer",
+            "track": cfg["track"],
+            "items": undo_items
+        }
+    }
