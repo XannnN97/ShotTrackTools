@@ -31,6 +31,19 @@
 - 修复 `backend.py` 对 `png_exporter` list/dict 返回值的兼容性处理
 - 修复 Electron 中 `findPythonCommand` 返回含空格字符串导致 `spawn ENOENT`
 - 修复 Python 子进程无法找到 `DaVinciResolveScript` 模块的问题（注入 PYTHONPATH）
+- 修复 `.gitignore` 中 `*.xml` 全局排除导致 `manifest.xml` 被忽略的问题（GitHub Issue #1）
+- 修复 `.gitignore` 中 `*.png` 全局排除过于宽泛的问题（移除用户运行产物排除规则）
+
+### 工程化改进（后续）
+- 清理根目录 `shottracktools_utils.py` 版本漂移（Issue #2）
+- 修复 Undo 匹配键使用 `GetStart()` 单键的问题，改为 `start` + `originalName` 双键匹配（Issue #4）
+- `RESOLVE_SCRIPT_LIB` 路径从硬编码改为多路径探测（C/D/E 盘 + 32/64位）（Issue #6）
+- `png_exporter.py` 添加输出目录可写性检查（Issue #7）
+- 添加 PNG 导出后"缩放到帧尺寸"提示（Issue #5）
+- `main.js` 添加 Python 子进程 60 秒超时机制（Issue #9）
+- 新增 PNG 生成单元测试（Issue #3）
+- README.md 更新命名空间为 `com.xannnn97.shottracktools`（Issue #11）
+- README.md 标注 Configurator 已被 Workflow Integration 取代（Issue #10）
 
 ---
 
