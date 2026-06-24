@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BlackmagicDesign>
+    <Plugin>
+        <Id>com.basefx.shottracktools</Id>
+        <Name>ShotTrackTools</Name>
+        <Version>1.1.0</Version>
+        <Description>Batch shot naming and tracking tools for DaVinci Resolve</Description>
+        <FilePath>main.js</FilePath>
+    </Plugin>
+</BlackmagicDesign>

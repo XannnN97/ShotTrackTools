@@ -16,15 +16,7 @@ __pycache__/
 Thumbs.db
 desktop.ini
 
-# Generated outputs (user runtime)
-*.png
-*.xml
-shot_list.json
-
-# User config directory
-config.json
-
-# Distribution
+# Distribution / packaging
 build/
 dist/
 *.egg-info/
