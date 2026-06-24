@@ -12,15 +12,15 @@ import json
 import tempfile
 import shutil
 
-# 添加项目目录到路径
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# 添加 workflow_integration 到路径
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'workflow_integration'))
 
 import shottracktools_utils as stu
 
 
 class TestVersion(unittest.TestCase):
     def test_version(self):
-        self.assertEqual(stu.__version__, "1.0.1")
+        self.assertEqual(stu.__version__, "1.1.0")
 
 
 class TestParseTrack(unittest.TestCase):
@@ -141,6 +141,35 @@ class TestGetParams(unittest.TestCase):
             json.dump(test_config, f)
         params = stu.get_params(schema, defaults)
         self.assertEqual(params["flag"], False)
+
+
+class TestGeneratePng(unittest.TestCase):
+    def setUp(self):
+        self.temp_dir = tempfile.mkdtemp()
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'workflow_integration'))
+        from lib.png_exporter import generate_png
+        self.generate_png = generate_png
+
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir, ignore_errors=True)
+
+    def test_png_file_created(self):
+        filepath = os.path.join(self.temp_dir, "test.png")
+        self.generate_png(filepath)
+        self.assertTrue(os.path.exists(filepath))
+
+    def test_png_header_valid(self):
+        filepath = os.path.join(self.temp_dir, "test.png")
+        self.generate_png(filepath)
+        with open(filepath, 'rb') as f:
+            header = f.read(8)
+        # PNG 文件签名: 89 50 4E 47 0D 0A 1A 0A
+        self.assertEqual(header, b'\x89PNG\r\n\x1a\n')
+
+    def test_png_file_not_empty(self):
+        filepath = os.path.join(self.temp_dir, "test.png")
+        self.generate_png(filepath)
+        self.assertGreater(os.path.getsize(filepath), 0)
 
 
 if __name__ == "__main__":

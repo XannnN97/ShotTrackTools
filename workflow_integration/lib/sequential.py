@@ -80,8 +80,8 @@ def run(resolve, cfg):
         old_name = name
         working = os.path.splitext(old_name)[0] if cfg["remove_suffix"] else old_name
 
-        # 记录原始名称
-        undo_items.append({"start": item.GetStart(), "originalName": old_name})
+        # 记录原始名称（含起始/结束帧，用于撤回双键匹配）
+        undo_items.append({"start": item.GetStart(), "end": item.GetEnd(), "originalName": old_name})
 
         num = cfg["start"] + (i * cfg["step"])
         new_name = "{}{}".format(cfg["prefix"], str(num).zfill(cfg["padding"]))

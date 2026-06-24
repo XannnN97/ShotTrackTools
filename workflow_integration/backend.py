@@ -80,7 +80,9 @@ def undo(undoData):
         if not items:
             return {"success": False, "logs": ["[ERROR] No clips on track"]}
 
+        # 双键撤回：先按 start 精确匹配，失败则按 originalName 搜索
         start_map = {item["start"]: item["originalName"] for item in undoData.get("items", [])}
+        name_map = {item["originalName"]: item["originalName"] for item in undoData.get("items", [])}
         restored = 0
         for item in items:
             start = item.GetStart()
@@ -90,6 +92,13 @@ def undo(undoData):
                 if current_name != original_name:
                     item.SetName(original_name)
                     logs.append("  Restored: {} -> {}".format(current_name, original_name))
+                    restored += 1
+            else:
+                # fallback：按名称搜索（用户移动了时间线位置）
+                current_name = item.GetName()
+                if current_name in name_map:
+                    item.SetName(name_map[current_name])
+                    logs.append("  Restored (by name): {} -> {}".format(current_name, name_map[current_name]))
                     restored += 1
         logs.append("-" * 40)
         logs.append("Undo done: {} clip(s) restored.".format(restored))

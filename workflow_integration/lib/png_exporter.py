@@ -201,6 +201,11 @@ def run(resolve, cfg):
         output_dir = os.path.join(os.path.expanduser("~"), "Desktop")
     os.makedirs(output_dir, exist_ok=True)
 
+    # 检查目录可写性
+    if not os.access(output_dir, os.W_OK):
+        logs.append("[ERROR] Output directory is not writable: {}".format(output_dir))
+        return logs
+
     # 获取帧率
     try:
         fps = float(timeline.GetSetting("timelineFrameRate"))
@@ -262,5 +267,8 @@ def run(resolve, cfg):
     logs.append("2. Select shot_track.xml")
     logs.append("3. Import to new or existing timeline")
     logs.append("4. Ensure PNG paths match XML pathurl")
+    logs.append("")
+    logs.append("[TIP] After importing, select all clips → right-click → 'Scale to Frame Size'")
+    logs.append("      导入后全选所有 clip → 右键 → '缩放到帧尺寸'")
 
     return logs

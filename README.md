@@ -37,13 +37,13 @@ ShotTrackTools 是一套用于 **DaVinci Resolve** 的 VFX/剪辑交接工作流
 
 **安装步骤**：
 
-1. 在以下路径**新建文件夹** `com.basefx.shottracktools`：
+1. 在以下路径**新建文件夹** `com.xannnn97.shottracktools`：
    ```
    C:\ProgramData\Blackmagic Design\DaVinci Resolve\Support\Workflow Integration Plugins\
    ```
    （如果 `Workflow Integration Plugins` 文件夹不存在，请手动创建）
 
-2. 将 `workflow_integration/` 目录内的**所有文件和子文件夹**复制到 `com.basefx.shottracktools/` 中
+2. 将 `workflow_integration/` 目录内的**所有文件和子文件夹**复制到 `com.xannnn97.shottracktools/` 中
 
 3. **重启 DaVinci Resolve**
 
@@ -79,7 +79,9 @@ ShotTrackTools 是一套用于 **DaVinci Resolve** 的 VFX/剪辑交接工作流
 3. 右侧填写参数，点击**执行**
 4. 底部日志区域显示操作结果
 5. 支持**中英文切换**（界面左下角）
-6. 参数可**保存配置**，下次启动自动恢复
+6. 支持**撤回**（Undo）功能，执行后可恢复原始名称
+
+> **注意**：v1.0.x 时代的 `ShotTrackTools_Configurator.py` 独立配置工具已被 Workflow Integration 统一 GUI 取代，`legacy/` 目录下的旧脚本仅作存档，不再推荐使用。
 
 ### 文件结构
 
@@ -118,7 +120,7 @@ ShotTrackTools/
 
 **Q1：Workflow Integration 菜单中没有 ShotTrackTools**
 
-- 确认安装路径是 `C:\ProgramData\...\Workflow Integration Plugins\com.basefx.shottracktools\`
+- 确认安装路径是 `C:\ProgramData\...\Workflow Integration Plugins\com.xannnn97.shottracktools\`
 - 确认文件夹内包含 `manifest.xml` 和 `main.js`
 - 确认使用的是 **DaVinci Resolve Studio**（免费版不支持）
 - 重启达芬奇后再次检查
@@ -170,13 +172,13 @@ Unified GUI with bilingual (CN/EN) support.
 
 **Steps**:
 
-1. Create a new folder `com.basefx.shottracktools` at:
+1. Create a new folder `com.xannnn97.shottracktools` at:
    ```
    C:\ProgramData\Blackmagic Design\DaVinci Resolve\Support\Workflow Integration Plugins\
    ```
    (Create `Workflow Integration Plugins` manually if it doesn't exist)
 
-2. Copy all files from `workflow_integration/` into `com.basefx.shottracktools/`
+2. Copy all files from `workflow_integration/` into `com.xannnn97.shottracktools/`
 
 3. **Restart DaVinci Resolve**
 
