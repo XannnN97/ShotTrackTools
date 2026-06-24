@@ -223,4 +223,4 @@ See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## Credits
 
-Developed by XAN for BaseFX VFX pipeline workflows.
+Developed by XannnN97 for DaVinci Resolve workflow development.
