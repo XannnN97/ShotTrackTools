@@ -37,13 +37,12 @@ ShotTrackTools 是一套用于 **DaVinci Resolve** 的 VFX/剪辑交接工作流
 
 **安装步骤**：
 
-1. 在以下路径**新建文件夹** `com.xannnn97.shottracktools`：
+1. 确认以下路径存在（如不存在请手动创建）：
    ```
    C:\ProgramData\Blackmagic Design\DaVinci Resolve\Support\Workflow Integration Plugins\
    ```
-   （如果 `Workflow Integration Plugins` 文件夹不存在，请手动创建）
 
-2. 将 `ShotTrackTools_v1.1.0/` 文件夹**整体复制**到 `C:\...\Workflow Integration Plugins\` 中即可，**无需重命名**
+2. 将 `ShotTrackTools_v1.1.0/` 文件夹**整体复制**到上述路径中即可，**无需重命名**
 
 3. **重启 DaVinci Resolve**
 
@@ -178,13 +177,12 @@ Unified GUI with bilingual (CN/EN) support.
 
 **Steps**:
 
-1. Create a new folder `com.xannnn97.shottracktools` at:
+1. Ensure the following path exists (create manually if it doesn't):
    ```
    C:\ProgramData\Blackmagic Design\DaVinci Resolve\Support\Workflow Integration Plugins\
    ```
-   (Create `Workflow Integration Plugins` manually if it doesn't exist)
 
-2. Copy `ShotTrackTools_v1.1.0/` folder directly into `C:\...\Workflow Integration Plugins\`, **no need to rename**
+2. Copy `ShotTrackTools_v1.1.0/` folder directly into the path above, **no need to rename**
 
 3. **Restart DaVinci Resolve**
 
