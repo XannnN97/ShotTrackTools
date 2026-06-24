@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 ShotTrackTools v1.1.0 单元测试
-测试 workflow_integration/ 架构下的公共模块和核心功能
+测试 ShotTrackTools_v1.1.0/ 架构下的公共模块和核心功能
 """
 
 import unittest
@@ -11,8 +11,8 @@ import sys
 import tempfile
 import shutil
 
-# 添加 workflow_integration 到路径
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'workflow_integration'))
+# 添加 ShotTrackTools_v1.1.0 到路径
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ShotTrackTools_v1.1.0'))
 
 import shottracktools_utils as stu
 from lib.png_exporter import generate_png, _make_chunk

@@ -43,7 +43,7 @@ ShotTrackTools 是一套用于 **DaVinci Resolve** 的 VFX/剪辑交接工作流
    ```
    （如果 `Workflow Integration Plugins` 文件夹不存在，请手动创建）
 
-2. 将 `workflow_integration/` 目录内的**所有文件和子文件夹**复制到 `com.xannnn97.shottracktools/` 中
+2. 将 `ShotTrackTools_v1.1.0/` 文件夹**整体复制**到 `C:\...\Workflow Integration Plugins\` 中即可，**无需重命名**
 
 3. **重启 DaVinci Resolve**
 
@@ -102,7 +102,7 @@ ShotTrackTools/
 │   ├── Timeline_Shot_to_PNG.py
 │   └── ShotTrackTools_Configurator.py
 │
-└── workflow_integration/             # Workflow Integration 插件（v1.1.0）
+└── ShotTrackTools_v1.1.0/            # Workflow Integration 插件（v1.1.0）
     ├── manifest.xml                   # 插件描述文件
     ├── package.json                   # Electron 配置
     ├── main.js                        # Electron 主进程
@@ -184,7 +184,7 @@ Unified GUI with bilingual (CN/EN) support.
    ```
    (Create `Workflow Integration Plugins` manually if it doesn't exist)
 
-2. Copy all files from `workflow_integration/` into `com.xannnn97.shottracktools/`
+2. Copy `ShotTrackTools_v1.1.0/` folder directly into `C:\...\Workflow Integration Plugins\`, **no need to rename**
 
 3. **Restart DaVinci Resolve**
 
@@ -243,7 +243,7 @@ ShotTrackTools/
 │   ├── Timeline_Shot_to_PNG.py
 │   └── ShotTrackTools_Configurator.py
 │
-└── workflow_integration/             # Workflow Integration plugin (v1.1.0)
+└── ShotTrackTools_v1.1.0/             # Workflow Integration plugin (v1.1.0)
     ├── manifest.xml                   # Plugin descriptor
     ├── package.json                   # Electron config
     ├── main.js                        # Electron main process

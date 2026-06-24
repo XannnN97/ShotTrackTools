@@ -14,7 +14,7 @@
 - 核心功能逻辑（lib/目录）从 Scripts 菜单版本提取为独立模块，返回日志列表而非直接打印
 
 ### 架构重构
-- 新增 `workflow_integration/` 目录，包含完整的插件结构
+- 新增 `ShotTrackTools_v1.1.0/` 目录，包含完整的插件结构
 - 提取 `lib/renamer.py`、`lib/sequential.py`、`lib/png_exporter.py`、`lib/remove_suffix.py`
 - 每个功能模块独立为 `run(resolve, cfg)` 接口，返回日志
 - 新增 `backend.py` 作为 Python 后端执行引擎（接收 stdin JSON，返回 stdout JSON）
@@ -22,7 +22,7 @@
 
 ### 工程化改进
 - 新增 `legacy/` 文件夹，旧版 Scripts 菜单独立脚本归档整理
-- 根目录只保留文档、配置和新版 `workflow_integration/` 文件夹
+- 根目录只保留文档、配置和新版 `ShotTrackTools_v1.1.0/` 文件夹
 - **移除 Pillow 依赖**：PNG 生成使用 Python 标准库 `zlib` / `struct` 实现，无需任何外部 Python 包
 - 修复 XML 生成循环缩进问题，确保每个 clipitem 标签正确闭合
 

@@ -103,7 +103,7 @@ ShotTrackTools/
 ├── legacy/                 # 旧版脚本存档，只读
 │   └── ...
 │
-└── workflow_integration/   # 当前版本插件
+└── ShotTrackTools_v1.1.0/   # 当前版本插件
     ├── manifest.xml        # 必须在 Git 中，不可被 .gitignore 排除
     ├── package.json
     ├── main.js
@@ -131,7 +131,7 @@ ShotTrackTools/
 
 ### 版本号漂移
 ❌ **错误**：`shottracktools_utils.py` 在多个位置有不同版本号
-✅ **正确**：只有一个 `__version__` 定义在 `workflow_integration/shottracktools_utils.py`
+✅ **正确**：只有一个 `__version__` 定义在 `ShotTrackTools_v1.1.0/shottracktools_utils.py`
 
 ### 文档遗漏
 ❌ **错误**：功能修复后 CHANGELOG 和 README 未更新
