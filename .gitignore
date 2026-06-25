@@ -20,3 +20,6 @@ desktop.ini
 build/
 dist/
 *.egg-info/
+
+# User-generated EDL files from plugin export
+*.edl
