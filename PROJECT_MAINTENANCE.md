@@ -92,7 +92,7 @@
 
 ```
 ShotTrackTools/
-├── .gitignore              # 只排除编译缓存、IDE、OS、分发目录
+├── .gitignore              # 只排除编译缓存、IDE、OS、分发目录、用户运行产物
 ├── CHANGELOG.md            # 所有版本变更必须记录
 ├── LICENSE
 ├── README.md               # 中英文双语
@@ -103,7 +103,24 @@ ShotTrackTools/
 ├── legacy/                 # 旧版脚本存档，只读
 │   └── ...
 │
-└── ShotTrackTools_v1.1.0/   # 当前版本插件
+├── ShotTrackTools_v1.1.0/   # 历史版本 v1.1.0（保留存档）
+│   ├── manifest.xml
+│   ├── package.json
+│   ├── main.js
+│   ├── preload.js
+│   ├── index.html
+│   ├── app.js
+│   ├── style.css
+│   ├── backend.py
+│   ├── shottracktools_utils.py
+│   └── lib/
+│       ├── __init__.py
+│       ├── renamer.py
+│       ├── sequential.py
+│       ├── png_exporter.py
+│       └── remove_suffix.py
+│
+└── ShotTrackTools_v1.2.0/   # 当前版本插件
     ├── manifest.xml        # 必须在 Git 中，不可被 .gitignore 排除
     ├── package.json
     ├── main.js
@@ -118,7 +135,8 @@ ShotTrackTools/
         ├── renamer.py
         ├── sequential.py
         ├── png_exporter.py
-        └── remove_suffix.py
+        ├── remove_suffix.py
+        └── edl_exporter.py   # v1.2.0 新增
 ```
 
 ---
@@ -131,7 +149,7 @@ ShotTrackTools/
 
 ### 版本号漂移
 ❌ **错误**：`shottracktools_utils.py` 在多个位置有不同版本号
-✅ **正确**：只有一个 `__version__` 定义在 `ShotTrackTools_v1.1.0/shottracktools_utils.py`
+✅ **正确**：只有一个 `__version__` 定义在 `ShotTrackTools_v1.2.0/shottracktools_utils.py`
 
 ### 文档遗漏
 ❌ **错误**：功能修复后 CHANGELOG 和 README 未更新
@@ -139,4 +157,4 @@ ShotTrackTools/
 
 ---
 
-> 最后更新：2025-06-24
+> 最后更新：2025-06-25

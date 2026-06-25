@@ -1,6 +1,6 @@
 # ShotTrackTools
 
-> **版本：v1.1.0**  
+> **版本：v1.2.0**  
 > **适用软件：DaVinci Resolve 21（Studio 版推荐）**  
 > **操作系统：Windows 10/11**
 
@@ -21,7 +21,10 @@ ShotTrackTools 是一套用于 **DaVinci Resolve** 的 VFX/剪辑交接工作流
 | **批量替换** | 将时间线轨道上所有 Clip Name 中的指定文本批量替换为另一文本 |
 | **顺序递增** | 按固定前缀和步长对时间线片段进行递增命名（如 `0010`, `0020`, `0030`） |
 | **PNG/XML 导出** | 生成透明 PNG 占位符 + FCP 7 XML v5，可导入达芬奇重建轨道 |
+| **EDL 导出** | 导出目标轨道的 CMX3600 标准 EDL 文件，含入出点与片段名称信息 |
 | **去后缀** | 批量去掉媒体池内所有片段的 `.png` 后缀 |
+| **自动轨道检测** | 自动识别当前时间线的所有视频/音频轨道，下拉菜单选择，无需手动输入 |
+| **配置持久化** | 每个功能独立保存上次参数，切换功能自动恢复，切换时间线/项目不受影响 |
 
 ### 安装方式（二选一）
 
@@ -42,7 +45,7 @@ ShotTrackTools 是一套用于 **DaVinci Resolve** 的 VFX/剪辑交接工作流
    C:\ProgramData\Blackmagic Design\DaVinci Resolve\Support\Workflow Integration Plugins\
    ```
 
-2. 将 `ShotTrackTools_v1.1.0/` 文件夹**整体复制**到上述路径中即可，**无需重命名**
+2. 将 `ShotTrackTools_v1.2.0/` 文件夹**整体复制**到上述路径中即可，**无需重命名**
 
 3. **重启 DaVinci Resolve**
 
@@ -73,12 +76,14 @@ ShotTrackTools 是一套用于 **DaVinci Resolve** 的 VFX/剪辑交接工作流
 
 ### 使用指南（Workflow Integration）
 
-1. 启动插件后，弹出统一 HTML GUI 窗口
-2. 左侧选择功能（批量替换 / 顺序递增 / PNG/XML 导出 / 去后缀）
-3. 右侧填写参数，点击**执行**
-4. 底部日志区域显示操作结果
-5. 支持**中英文切换**（界面右上角）
-6. 支持**撤回**（Undo）功能，执行后可恢复原始名称
+1. 启动插件后，弹出统一 HTML GUI 窗口，顶部显示当前时间线名称
+2. 左侧选择功能（批量替换 / 顺序递增 / PNG/XML 导出 / EDL 导出 / 去后缀）
+3. 目标轨道通过下拉菜单选择（自动检测当前时间线所有视频/音频轨道，支持切换时间线后自动刷新）
+4. 右侧填写参数，点击**执行**
+5. 底部日志区域显示操作结果
+6. 支持**中英文切换**（界面右上角）
+7. 支持**撤回**（Undo）功能，执行后可恢复原始名称
+8. 参数自动保存，下次打开自动恢复上次配置
 
 > **注意**：v1.0.x 时代的 `ShotTrackTools_Configurator.py` 独立配置工具已被 Workflow Integration 统一 GUI 取代，`legacy/` 目录下的旧脚本仅作存档，不再推荐使用。
 
@@ -101,22 +106,40 @@ ShotTrackTools/
 │   ├── Timeline_Shot_to_PNG.py
 │   └── ShotTrackTools_Configurator.py
 │
-└── ShotTrackTools_v1.1.0/            # Workflow Integration 插件（v1.1.0）
+├── ShotTrackTools_v1.1.0/            # Workflow Integration 插件（v1.1.0，历史版本）
+│   ├── manifest.xml                   # 插件描述文件
+│   ├── package.json                   # Electron 配置
+│   ├── main.js                        # Electron 主进程
+│   ├── preload.js                     # 安全预加载（v19.0.2+ 兼容）
+│   ├── index.html                     # UI 入口页面
+│   ├── app.js                         # 前端逻辑（功能切换、参数收集、IPC）
+│   ├── style.css                      # 达芬奇风格样式
+│   ├── backend.py                     # Python 后端执行引擎
+│   ├── shottracktools_utils.py        # 公共模块（版本号、轨道解析）
+│   └── lib/
+│       ├── __init__.py
+│       ├── renamer.py                 # 批量替换逻辑
+│       ├── sequential.py              # 顺序递增逻辑
+│       ├── png_exporter.py            # PNG/XML 导出逻辑
+│       └── remove_suffix.py           # 去后缀逻辑
+│
+└── ShotTrackTools_v1.2.0/            # 当前版本（v1.2.0，推荐安装）
     ├── manifest.xml                   # 插件描述文件
     ├── package.json                   # Electron 配置
-    ├── main.js                        # Electron 主进程
-    ├── preload.js                     # 安全预加载（v19.0.2+ 兼容）
+    ├── main.js                        # Electron 主进程（含 IPC 新接口）
+    ├── preload.js                     # 安全预加载
     ├── index.html                     # UI 入口页面
-    ├── app.js                         # 前端逻辑（功能切换、参数收集、IPC）
+    ├── app.js                         # 前端逻辑（轨道下拉、配置缓存、EDL 导出）
     ├── style.css                      # 达芬奇风格样式
-    ├── backend.py                     # Python 后端执行引擎
-    ├── shottracktools_utils.py        # 公共模块（版本号、轨道解析）
+    ├── backend.py                     # Python 后端执行引擎（含 EDL、配置持久化）
+    ├── shottracktools_utils.py        # 公共模块（含 get_timeline_info）
     └── lib/
         ├── __init__.py
         ├── renamer.py                 # 批量替换逻辑
         ├── sequential.py              # 顺序递增逻辑
         ├── png_exporter.py            # PNG/XML 导出逻辑
-        └── remove_suffix.py           # 去后缀逻辑
+        ├── remove_suffix.py           # 去后缀逻辑
+        └── edl_exporter.py            # EDL 导出逻辑（新增）
 ```
 
 ### 常见问题
@@ -161,7 +184,10 @@ ShotTrackTools is a set of VFX/editorial handoff workflow utilities for **DaVinc
 | **Batch Replace** | Batch replace text in timeline Clip Names (e.g. `sq1300` → `sq1400`) |
 | **Sequential Naming** | Sequential naming with fixed prefix and step (e.g. `0010`, `0020`, `0030`) |
 | **PNG/XML Export** | Generate transparent PNG placeholders + FCP 7 XML v5 for timeline reconstruction |
+| **EDL Export** | Export target track to CMX3600 EDL with in/out points and clip names |
 | **Remove Suffix** | Batch remove `.png` suffix from Media Pool clips |
+| **Auto Track Detection** | Automatically detect all video/audio tracks on current timeline, dropdown selection, no manual input |
+| **Config Persistence** | Per-function config saved to disk, auto-restored on switch, survives timeline/project changes |
 
 ### Installation
 
@@ -182,7 +208,7 @@ Unified GUI with bilingual (CN/EN) support.
    C:\ProgramData\Blackmagic Design\DaVinci Resolve\Support\Workflow Integration Plugins\
    ```
 
-2. Copy `ShotTrackTools_v1.1.0/` folder directly into the path above, **no need to rename**
+2. Copy `ShotTrackTools_v1.2.0/` folder directly into the path above, **no need to rename**
 
 3. **Restart DaVinci Resolve**
 
@@ -213,12 +239,14 @@ Individual scripts for the Scripts menu.
 
 ### Usage Guide (Workflow Integration)
 
-1. Launch the plugin, the unified HTML GUI window appears
-2. Select function on the left (Batch Replace / Sequential / PNG/XML Export / Remove Suffix)
-3. Fill parameters on the right, click **Execute**
-4. View operation results in the log panel at the bottom
-5. Supports **CN/EN language switching** (top-right corner)
-6. Supports **Undo** to restore original names after execution
+1. Launch the plugin, the unified HTML GUI window appears with current timeline name shown at top
+2. Select function on the left (Batch Replace / Sequential / PNG/XML Export / EDL Export / Remove Suffix)
+3. Choose target track from dropdown (auto-detects all video/audio tracks, refreshes on timeline switch)
+4. Fill parameters on the right, click **Execute**
+5. View operation results in the log panel at the bottom
+6. Supports **CN/EN language switching** (top-right corner)
+7. Supports **Undo** to restore original names after execution
+8. Parameters are auto-saved and restored on next use
 
 > **Note**: The v1.0.x `ShotTrackTools_Configurator.py` standalone tool has been replaced by the Workflow Integration unified GUI. Scripts in `legacy/` are archived only and not recommended for use.
 
@@ -241,22 +269,40 @@ ShotTrackTools/
 │   ├── Timeline_Shot_to_PNG.py
 │   └── ShotTrackTools_Configurator.py
 │
-└── ShotTrackTools_v1.1.0/             # Workflow Integration plugin (v1.1.0)
+├── ShotTrackTools_v1.1.0/             # Workflow Integration plugin (v1.1.0, historical)
+│   ├── manifest.xml                   # Plugin descriptor
+│   ├── package.json                   # Electron config
+│   ├── main.js                        # Electron main process
+│   ├── preload.js                     # Security preload (v19.0.2+ compatible)
+│   ├── index.html                     # UI entry page
+│   ├── app.js                         # Frontend logic (feature switching, params, IPC)
+│   ├── style.css                      # DaVinci-style theme
+│   ├── backend.py                     # Python backend execution engine
+│   ├── shottracktools_utils.py        # Common module (version, track parsing)
+│   └── lib/
+│       ├── __init__.py
+│       ├── renamer.py                 # Batch replace logic
+│       ├── sequential.py              # Sequential naming logic
+│       ├── png_exporter.py            # PNG/XML export logic
+│       └── remove_suffix.py           # Suffix removal logic
+│
+└── ShotTrackTools_v1.2.0/             # Current version (v1.2.0, recommended for installation)
     ├── manifest.xml                   # Plugin descriptor
     ├── package.json                   # Electron config
-    ├── main.js                        # Electron main process
-    ├── preload.js                     # Security preload (v19.0.2+ compatible)
+    ├── main.js                        # Electron main process (with new IPC interfaces)
+    ├── preload.js                     # Security preload
     ├── index.html                     # UI entry page
-    ├── app.js                         # Frontend logic (feature switching, params, IPC)
+    ├── app.js                         # Frontend logic (track dropdown, config cache, EDL export)
     ├── style.css                      # DaVinci-style theme
-    ├── backend.py                     # Python backend execution engine
-    ├── shottracktools_utils.py        # Common module (version, track parsing)
+    ├── backend.py                     # Python backend (with EDL, config persistence)
+    ├── shottracktools_utils.py        # Common module (with get_timeline_info)
     └── lib/
         ├── __init__.py
         ├── renamer.py                 # Batch replace logic
         ├── sequential.py              # Sequential naming logic
         ├── png_exporter.py            # PNG/XML export logic
-        └── remove_suffix.py           # Suffix removal logic
+        ├── remove_suffix.py           # Suffix removal logic
+        └── edl_exporter.py            # EDL export logic (new)
 ```
 
 ### FAQ
