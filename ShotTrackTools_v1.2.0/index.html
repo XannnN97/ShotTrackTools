@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>ShotTrackTools</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <div>
+      <span class="header-title">ShotTrackTools</span>
+      <span class="header-version" id="versionText">版本 1.2.0</span>
+      <span class="header-timeline" id="timelineName" style="margin-left:15px;color:#888;font-size:12px;">无时间线</span>
+    </div>
+    <div class="lang-switch">
+      <button class="lang-btn active" data-lang="zh">中文</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="sidebar" id="sidebar"></div>
+    <div class="content-area">
+      <div id="content" style="padding:20px;overflow-y:auto;">
+        <p style="color:#888;padding:40px 0;text-align:center;">请选择左侧功能</p>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="btnExecute">执行</button>
+        <button class="btn btn-secondary" id="btnUndo" disabled>撤回</button>
+      </div>
+      <div class="log-panel">
+        <div class="log-header" id="logHeader">日志</div>
+        <div class="log-body" id="logBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-bar" id="statusText">就绪</div>
+
+  <script src="app.js"></script>
+</body>
+</html>
